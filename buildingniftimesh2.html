@@ -75,7 +75,7 @@
 				scene = new THREE.Scene();
 				scene.fog = new THREE.Fog( 0x72645b, 2, 15 );
 
-
+				
 				// Ground
 
 				var plane = new THREE.Mesh(
@@ -137,7 +137,7 @@
 				loader.load( 'ij150-win-jre6/ImageJ/test.obj', function ( object ) {
 				
 				 object.traverse( function ( child ) {
-				//console.log(child);
+				console.log(child);
                     if ( child instanceof THREE.Mesh ) {
                         child.material = new THREE.MeshLambertMaterial( { color: 0x0055ff , opacity: 0.2, transparent: true });
 
@@ -158,7 +158,7 @@
 
 					
 					scene.add(object);
-					console.log(object);
+
 				}, onProgress, onError );
 				
 				var loader = new THREE.PLYLoader();
@@ -181,7 +181,6 @@
 					mesh.receiveShadow = true;
 
 					scene.add( mesh );
-					console.log(mesh);
 					
 					
 	
@@ -198,7 +197,6 @@
 	
 	
 	scene.add(floor);
-	console.log(scene);
 
 				// Lights
 
@@ -355,7 +353,6 @@ function onDocumentMouseMove( event )
 				INTERSECTED.children[0].material.opacity= 0.2 ;}
 				else{
 			INTERSECTED.material.opacity= 0.2 ;
-			console.log(scene);
 			}
 			// 0.2 INTERSECTED.currentopacity
 		// remove previous intersection object reference
