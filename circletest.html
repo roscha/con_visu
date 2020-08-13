@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+
+<meta charset="utf-8">
+<head>
+
+<style>
+
+.node {
+  font: 300 11px "Helvetica Neue", Helvetica, Arial, sans-serif;
+  fill: #bbb;
+  
+  font-size: 36px;
+	font-weight: bold;
+	line-height: 26.4px;
+}
+
+.node:hover {
+  fill: #000;
+}
+
+.link {
+  
+  stroke-opacity: .1;
+  fill: none;
+  pointer-events: none;
+}
+
+.node:hover,
+.node--source,
+.node--target {
+  font-weight: 1700;
+}
+
+.node--source {
+  fill: #2ca02c;
+}
+
+.node--significant {
+  font-weight: 1900;
+  fill: #2ca02c;
+
+}
+
+.node--netvisual1 {
+  fill: #577ab5;
+}
+.node--netmotor {
+  fill: #59aa6c;
+}
+.node--netfronto-temp {
+  fill: #c44f53;
+}
+.node--netvisual2 {
+  fill: #8678b5;
+}
+.node--netRattention {
+  fill: #cdba77;
+}
+.node--netDMN {
+  fill: #68b7ce;
+}
+.node--netauditory {
+  fill: #95c7ff;
+}
+.node--netLattention {
+  fill: #9af0ac;
+}
+.node--netstriatum {
+  fill: #ffa19c;
+}
+.node--netsub-cort {
+  fill: #d1bdff;
+}
+.node--netcereb {
+  fill: #fffea8;
+}
+
+
+  
+.node--target {
+  fill: #d62728;
+}
+
+.link--source,
+.link--target {
+  stroke-opacity: 1;
+  stroke-width: 2px;
+}
+
+.link--source {
+  stroke: #d62728;
+}
+
+.link--target {
+  stroke: #2ca02c;
+}
+
+.link--significant {
+  stroke-opacity: 0.5;
+  stroke-width: 2px;
+
+}
+.link--signisigni {
+  stroke-opacity: 1;
+  stroke-width: 3px;
+
+}
+
+
+.link--groupall-group {
+  stroke: #1ed21e;
+}
+.link--groupADHD--Control {
+  stroke: #6ee2e2;
+}
+.link--groupADHD {
+  stroke: #ff0e0e;
+}
+.link--groupADHD--ADHD-Siblings {
+  stroke: #ff66b1;
+}
+.link--groupADHD-Siblings {
+  stroke: #dd54dd;
+}
+.link--groupADHD-Siblings--Control {
+  stroke: #c58dff;
+}
+.link--groupControl {
+  stroke: #4c4cba;
+}
+</style>
+</head>
+<body>
+<div id='chart1'></div>
+
+
+  
+<script src="http://cdnjs.cloudflare.com/ajax/libs/d3/3.4.8/d3.min.js"></script>
+<script src="http://code.jquery.com/jquery-2.2.4.min.js"></script>
+
+<script>
+$("#chart1").width("480px");
+$("#chart1").height("500px");
+ 
+var margin = {top: 20, right: 20, bottom: 30, left: 40};
+  var width = 880 - margin.left - margin.right;
+  var height = 500 - margin.top - margin.bottom;
+
+ 
+  
+var diameter = 500,
+    radius = diameter / 2,
+    innerRadius = radius - 60;
+
+var cluster = d3.layout.cluster()
+    .size([360, innerRadius])
+    .sort(null)
+    .value(function(d) { return d.size; });
+
+var bundle = d3.layout.bundle();
+//,'ADHD & ADHD Siblings'
+var group2=['all group','ADHD & Control','ADHD','ADHD & ADHD Siblings','ADHD Siblings','ADHD Siblings & Control','Control'];
+var group=['all-group','ADHD--Control','ADHD','ADHD--ADHD-Siblings','ADHD-Siblings','ADHD-Siblings--Control','Control'];
+var net=['visual1','motor','fronto-temp','visual2','Rattention','DMN','auditory','Lattention','striatum','sub-cort','cereb'];
+var line = d3.svg.line.radial()
+    .interpolate("bundle")
+    .tension(.85)
+    .radius(function(d) { return d.y; })
+    .angle(function(d) { return d.x  / 180 * Math.PI; });
+
+var svg = d3.select("#chart1").append("svg")
+    .attr("width", diameter)
+    .attr("height", diameter)
+  .append("g")
+    .attr("transform", "translate(" + radius + "," + radius + ")");
+
+var link = svg.append("g").selectAll(".link"),
+    node = svg.append("g").selectAll(".node");
+    console.log(node);
+    console.log(link);
+//https://bl.ocks.org/mbostock/7607999#  //readme-flare-imports
+    
+    //for (var u = 1; u < 2; u++) {//for (var u = 0; u < group2.length; u++) {
+    var u = 2;
+//element.append("<button id='cmd'>"+group2[u]+"</button>");
+    
+
+    //var jsPDF = require(['jsPDF']);
+    //var doc = new jsPDF();
+    
+var specialElementHandlers = {
+    '#chart1': function (element, renderer) {
+        return true;
+    }
+};
+
+$('#cmd').click(function () {
+    
+    doc.fromHTML($('#chart1').html(), 15, 15, {
+        'width': 170,
+            'elementHandlers': specialElementHandlers
+    });
+    doc.save('/javascript/file/test.pdf');
+});
+
+d3.json("https://github.com/roscha/con_visu/blob/master/data.json", function(error, classes) {//file/by2/SIBLING-CONTROLcommat_C-S-C-S.//"+group2[u]+"
+    
+  if (error) throw error;
+    
+    //if (u==0){
+        var nodes = cluster.nodes(packageHierarchy(classes));
+        
+        var links = packageImports(nodes);
+    //}else{link.push(packageImports(nodes));}
+  var vargroup="link--group";
+  link = link
+      .data(bundle(links))
+    .enter().append("path")
+      .each(function(d) { d.source = d[0], d.target = d[d.length -1], d.type = d[2]; })
+      .attr("class", "link")
+      .attr("d", line)
+    .classed(vargroup+group[u],true);//function(l) { return l.type==group[u]; });
+    
+    
+//stroke: steelblue;
+  node = node
+      .data(nodes.filter(function(n) { return !n.children; }))
+    .enter().append("text")
+      .attr("class", "node")
+      .attr("dy", ".31em")
+      .attr("transform", function(d) { return "rotate(" + (d.x - 90) + ")translate(" + (d.y + 1) + ",0)" ; })//+ (d.x <= 180 ? "" : "rotate(180)")
+      //.style("text-anchor", function(d) { return d.x <= 180 ? "start" : "end"; })
+      .text("-")//function(d) { return d.key; })//.text(function(d) { return d.label; })
+  //.each(function(n) { if (n.significant) {n.text("*");} })
+      .on("mouseover", mouseovered)
+      .on("mouseout", mouseouted);
+    var varnet="node--net";
+    //node
+      //.classed("node--significant", function(n) { return n.significant; })
+        // the color correspond to the networks
+    for (var o = 0; o < net.length; o++) {
+    node
+      .classed(varnet+net[o],function(n) { return n.net==net[o]; });
+    }
+    
+    // the color of node depend on group belonging
+    
+    
+    //for (var o = 0; o < group.length; o++) {
+    //link
+    //  .classed(vargroup+group[o],true);//function(l) { return l.type==group[o]; })
+    ////.filter(function(l) { return l.target === d || l.source === d; })
+//      .each(function() { this.parentNode.appendChild(this); });  
+    //}
+    // opacity is associate with significance
+    link
+      .classed("link--significant", function(l) { return l.source.significant && !(l.target.significant); })
+      .classed("link--signisigni", function(l) { return (l.source.significant) && (l.target.significant); })
+    //.filter(function(l) { return l.target === d || l.source === d; })
+      .each(function() { this.parentNode.appendChild(this); });  
+    
+});
+    //}
+
+function mouseovered(d) {
+  node
+      .each(function(n) { n.target = n.source = false; });
+
+  link
+      .classed("link--target", function(l) { if (l.target === d) return l.source.source = true; })
+      .classed("link--source", function(l) { if (l.source === d) return l.target.target = true; })
+    .filter(function(l) { return l.target === d || l.source === d; })
+      .each(function() { this.parentNode.appendChild(this); });
+  
+
+  node
+      .classed("node--target", function(n) { return n.target; })
+      .classed("node--source", function(n) { return n.source; });
+}
+
+function mouseouted(d) {
+  link
+      .classed("link--target", false)
+      .classed("link--source", false);
+
+  node
+      .classed("node--target", false)
+      .classed("node--source", false);
+}
+
+d3.select(self.frameElement).style("height", diameter + "px");
+
+// Lazily construct the package hierarchy from class names.
+function packageHierarchy(classes) {
+  var map = {};
+
+  function find(name, data) {
+    var node = map[name], i;
+    if (!node) {
+      node = map[name] = data || {name: name, children: []};
+      if (name.length) {
+        node.parent = find(name.substring(0, i = name.lastIndexOf(".")));
+        node.parent.children.push(node);
+        node.key = name.substring(i + 1);
+      }
+        
+    }
+    //comsole.log(node);
+    return node;
+  }
+
+  classes.forEach(function(d) {
+    find(d.name, d);
+  });
+
+  return map[""];
+}
+
+// Return a list of imports for the given array of nodes.
+function packageImports(nodes) {
+  var map = {},
+      imports = [];
+
+  // Compute a map from name to node.
+  nodes.forEach(function(d) {
+    map[d.name] = d;
+  });
+
+  // For each import, construct a link from the source to target node.
+  nodes.forEach(function(d) {
+    if (d.imports) d.imports.forEach(function(i) {
+      imports.push({source: map[d.name], target: map[i], type: d.type});
+    });
+  });
+    
+  return imports;
+}
+
+</script>
+</body>
+</html>
